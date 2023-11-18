@@ -39,9 +39,9 @@ int main(int ac, char **av)
 	{
 		mpz_init_set_str(num_elements, line, 10);
 		prime_nums_of(num_elements);
+		mpz_clear(num_elements);
 	}
 
-	mpz_clear(num_elements);
 	free(line);
 	fclose(file);
 	return (0);
@@ -100,6 +100,7 @@ void prime_nums_of(mpz_t n)
 	}
 	mpz_clear(i);
 	mpz_clear(j);
+	mpz_clear(m);
 	mpz_clear(sqrt_n);
 }
 
