@@ -15,15 +15,14 @@ void prime_nums_of(mpz_t n);
  */
 int main(int ac, char **av)
 {
-	mpz_t num, num_elements;
-
+	mpz_t num_elements;
 	size_t size = 0;
 	FILE *file;
 	char *line = NULL;
 
 	if (ac != 2)
 	{
-		printf("Usage: factors <file>\n");
+		fprintf(stderr, "Usage: factors <file>\n");
 		return (1);
 	}
 
@@ -34,8 +33,6 @@ int main(int ac, char **av)
 		return (1);
 	}
 
-	line = malloc(1);
-	size = sizeof(line);
 	mpz_init(num_elements);
 
 	while (getline(&line, &size, file) != -1)
@@ -45,6 +42,8 @@ int main(int ac, char **av)
 	}
 
 	mpz_clear(num_elements);
+	free(line);
+	fclose(file);
 	return (0);
 }
 /**
@@ -55,14 +54,7 @@ int main(int ac, char **av)
   */
 void prime_nums_of(mpz_t n)
 {
-	mpz_t i, j, sqrt_n, m;
-	int l, k, x;
-
-	mpz_init(i);
-	mpz_init(j);
-	mpz_init(m);
-	mpz_init(sqrt_n);
-	mpz_sqrt(sqrt_n, n);
+	int l, k, x, get_i;
 
 	k = mpz_get_si(n);
 	for (x = 1; x < 4; x++)
@@ -74,6 +66,13 @@ void prime_nums_of(mpz_t n)
 		}
 	}
 
+	mpz_t i, j, sqrt_n, m;
+	mpz_init(i);
+	mpz_init(j);
+	mpz_init(m);
+	mpz_init(sqrt_n);
+	mpz_sqrt(sqrt_n, n);
+
 	for (mpz_init_set_ui(i, 2); mpz_cmp(i, sqrt_n) <= 0; mpz_add_ui(i, i, 1))
 	{
 		l = 0;
@@ -81,6 +80,7 @@ void prime_nums_of(mpz_t n)
 		if (mpz_divisible_p(n, i) != 0)
 		{
 			mpz_set(j, i);
+			get_i = mpz_get_si(i);
 			while (mpz_cmp_ui(j, 0) > 0)
 			{
 				if (mpz_divisible_p(i, j) != 0)
@@ -89,7 +89,7 @@ void prime_nums_of(mpz_t n)
 
 				if (l == 2)
 				{
-					mpz_tdiv_q_ui(m, n, mpz_get_ui(i));
+					mpz_tdiv_q_ui(m, n, get_i);
 					gmp_printf("%Zd=%Zd*%Zd\n", n, m, i);
 					break;
 				}
