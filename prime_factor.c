@@ -79,7 +79,6 @@ void prime_nums_of(mpz_t n)
 			gmp_printf("%Zd=%Zd*%Zd\n", n, m, i);
 			break;
 		}
-		gmp_printf("%Zd\n", i);
 	}
 	mpz_clear(i);
 	mpz_clear(m);
