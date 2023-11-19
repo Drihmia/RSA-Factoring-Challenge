@@ -77,7 +77,8 @@ void prime_nums_of(mpz_t n)
 			break;
 		}
 	}
-	if (l == 1)
+	mpz_init_set_ui(i, 0);
+	if (l == 1 && mpz_cmp(n, i) != 0)
 		gmp_printf("%Zd=%Zd*%d\n", n, n, 1);
 	mpz_clear(i);
 	mpz_clear(m);
