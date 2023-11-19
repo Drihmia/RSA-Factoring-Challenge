@@ -56,7 +56,7 @@ int main(int ac, char **av)
  */
 void prime_nums_of(mpz_t n)
 {
-	int l;
+	int l = 0;
 	mpz_t i, sqrt_n, m;
 
 
@@ -77,9 +77,14 @@ void prime_nums_of(mpz_t n)
 			break;
 		}
 	}
-	mpz_init_set_ui(i, 0);
-	if (l == 1 && mpz_cmp(n, i) != 0)
-		gmp_printf("%Zd=%Zd*%d\n", n, n, 1);
+
+	if (l == 1)
+	{
+		mpz_init_set(i, 0);
+		if ( mpz_cmp(n, i) != 0)
+			gmp_printf("%Zd=%Zd*%d\n", n, n, 1);
+	}
+
 	mpz_clear(i);
 	mpz_clear(m);
 	mpz_clear(sqrt_n);
