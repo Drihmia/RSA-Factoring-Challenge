@@ -1,8 +1,9 @@
+#define _POSIX_C_SOURCE 200809L
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdint.h>
 #include <gmp.h>
-
 
 void prime_nums_of(mpz_t n);
 /**
@@ -35,9 +36,12 @@ int main(int ac, char **av)
 
 	while (getline(&line, &size, file) != -1)
 	{
-		mpz_init_set_str(num_elements, line, 10);
-		prime_nums_of(num_elements);
-		mpz_clear(num_elements);
+		if (line && strlen(line) > 1)
+		{
+			mpz_init_set_str(num_elements, line, 10);
+			prime_nums_of(num_elements);
+			mpz_clear(num_elements);
+		}
 	}
 
 	free(line);
@@ -52,36 +56,32 @@ int main(int ac, char **av)
  */
 void prime_nums_of(mpz_t n)
 {
-	int l, k, x, get_i;
+	int l;
+	mpz_t i, sqrt_n, m;
 
-	k = mpz_get_si(n);
-	for (x = 1; x < 4; x++)
-	{
-		if (x == k)
-		{
-			printf("%d=%d*1\n", k, k);
-			return;
-		}
-	}
-
-	mpz_t i, j, sqrt_n, m;
 
 	mpz_init(i);
-	mpz_init2(m, 128000);
+	mpz_init(m);
+	mpz_init(sqrt_n);
+	mpz_sqrt(sqrt_n, n);
 
-	for (mpz_init_set_ui(i, 2); mpz_cmp(i, n) <= 0; mpz_add_ui(i, i, 1))
+
+	for (mpz_init_set_ui(i, 2); mpz_cmp(i, sqrt_n) <= 0; mpz_add_ui(i, i, 1))
 	{
-		/* check how many times n is divisible by i */
+		l = 1;
 		if (mpz_divisible_p(n, i) != 0)
 		{
-			get_i = mpz_get_ui(i);
-			mpz_divexact(m, n, i);
+			mpz_tdiv_q(m, n, i);
 			gmp_printf("%Zd=%Zd*%Zd\n", n, m, i);
+			l = 0;
 			break;
 		}
 	}
+	if (l == 1)
+		gmp_printf("%Zd=%Zd*%d\n", n, n, 1);
 	mpz_clear(i);
 	mpz_clear(m);
+	mpz_clear(sqrt_n);
 }
 
 
