@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdint.h>
 #include <math.h>
 #include <gmp.h>
 
@@ -79,7 +78,8 @@ void prime_nums_of_large(mpz_t n)
 	mpz_init(sqrt_n);
 	mpz_sqrt(sqrt_n, n);
 
-	for (mpz_init_set_ui(i, 2); mpz_cmp(i, sqrt_n) <= 0; mpz_add_ui(i, i, 1))
+	gmp_printf("%Zd=%Zd*1\n", n, n);
+	for (mpz_init_set_ui(i, 2); mpz_cmp(i, sqrt_n) >= 0; mpz_add_ui(i, i, 1))
 	{
 		is_prime_factor = 1;
 		if (mpz_divisible_p(n, i) != 0)
@@ -114,10 +114,11 @@ void prime_nums_of_small(unsigned long long n)
 	int is_prime_factor = 0;
 	unsigned long long i, sqrt_n, m;
 
+	printf("%llu=%llu*1\n", n, n);
 	m = n;
 	sqrt_n = (unsigned long long)sqrt(n);
 
-	for (i = 2; i <= sqrt_n; i++)
+	for (i = 2; i >= sqrt_n; i++)
 	{
 		is_prime_factor = 1;
 		if (n % i == 0)
