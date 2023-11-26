@@ -1,137 +1,68 @@
-#define _POSIX_C_SOURCE 200809L
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <math.h>
 #include <gmp.h>
 
-void prime_nums_of_large(mpz_t n);
-void prime_nums_of_small(unsigned long long n);
-
-/**
- * main - Entry point
- * @ac: counter argument.
- * @av: array of strings
- * Return: int
- */
-int main(int ac, char **av)
+void factorize_number(mpz_t n)
 {
-	mpz_t num_elements;
-	size_t size = 0;
-	FILE *file;
-	char *line = NULL;
+	mpz_t factor, m, ll;
+	int kl = 0;
 
-	if (ac != 2)
+	mpz_init(factor);
+	mpz_init(m);
+	mpz_init(ll);
+	mpz_sqrt(ll, n);
+
+	mpz_set_ui(factor, 2);
+	while (mpz_cmp_ui(factor, (unsigned long)ll) <= 0)
 	{
-		fprintf(stderr, "Usage: factors <file>\n");
+		while (mpz_divisible_p(n, factor))
+		{
+			mpz_divexact(m, n, factor);
+			gmp_printf("%Zd=%Zd*%Zd\n", n, m, factor);
+			kl = 1;
+			mpz_set(n, m);
+			return;
+		}
+		mpz_nextprime(factor, factor);
+	}
+
+	if (kl == 0 && mpz_cmp_ui(n, 2) > 0)
+	{
+		gmp_printf("%Zd=%Zd*1\n", n, n);
+	}
+
+	mpz_clear(factor);
+	mpz_clear(m);
+}
+
+int main(int argc, char *argv[])
+{
+	if (argc != 2)
+	{
+		fprintf(stderr, "Usage: %s <filename>\n", argv[0]);
 		return (1);
 	}
 
-	file = fopen(av[1], "r");
+	FILE *file = fopen(argv[1], "r");
+
 	if (file == NULL)
 	{
 		perror("Error opening file");
 		return (1);
 	}
 
-	mpz_init(num_elements);
+	char buffer[100000];
+	mpz_t number;
 
-	while (getline(&line, &size, file) != -1)
+	mpz_init(number);
+
+	if (fgets(buffer, sizeof(buffer), file) != NULL)
 	{
-		if (line && strlen(line) > 1)
-		{
-			size_t len = strlen(line);
-
-			if (len <= 20)
-			{
-				unsigned long long num = strtoull(line, NULL, 10);
-
-				prime_nums_of_small(num);
-			}
-			else
-			{
-				mpz_init_set_str(num_elements, line, 10);
-				prime_nums_of_large(num_elements);
-				mpz_clear(num_elements);
-			}
-		}
+		mpz_set_str(number, buffer, 10);
+		factorize_number(number);
 	}
 
-	free(line);
 	fclose(file);
+	mpz_clear(number);
 	return (0);
 }
-
-/**
- * prime_nums_of_large - Factorize the given number
- * using GMP and print the result.
- *
- * @n: The number to factorize.
- */
-void prime_nums_of_large(mpz_t n)
-{
-	int is_prime_factor = 0;
-	mpz_t i, sqrt_n, m;
-
-	mpz_init(i);
-	mpz_init(m);
-	mpz_init(sqrt_n);
-	mpz_sqrt(sqrt_n, n);
-
-	for (mpz_init_set_ui(i, 2); mpz_cmp(i, sqrt_n) <= 0; mpz_add_ui(i, i, 1))
-	{
-		is_prime_factor = 1;
-		if (mpz_divisible_p(n, i) != 0)
-		{
-			mpz_tdiv_q(m, n, i);
-			gmp_printf("%Zd=%Zd*%Zd\n", n, m, i);
-			is_prime_factor = 0;
-			break;
-		}
-	}
-
-	if (is_prime_factor == 1)
-	{
-		mpz_init_set_ui(i, 0);
-		if (mpz_cmp(n, i) != 0)
-			gmp_printf("%Zd=%Zd*%d\n", n, n, 1);
-	}
-
-	mpz_clear(i);
-	mpz_clear(m);
-	mpz_clear(sqrt_n);
-}
-
-/**
- * prime_nums_of_small - Factorize the given number using
- * unsigned long long and print the result.
- *
- * @n: The number to factorize.
- */
-void prime_nums_of_small(unsigned long long n)
-{
-	int is_prime_factor = 0;
-	unsigned long long i, sqrt_n, m;
-
-	m = n;
-	sqrt_n = (unsigned long long)sqrt(n);
-
-	for (i = 2; i <= sqrt_n; i++)
-	{
-		is_prime_factor = 1;
-		if (n % i == 0)
-		{
-			m = n / i;
-			printf("%llu=%llu*%llu\n", n, m, i);
-			is_prime_factor = 0;
-			break;
-		}
-	}
-
-	if (is_prime_factor == 1 && n != 0)
-	{
-		if (n != 1)
-			printf("%llu=%llu*%d\n", n, n, 1);
-	}
-}
-
