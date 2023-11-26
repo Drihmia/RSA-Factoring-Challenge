@@ -26,6 +26,8 @@ void faize_number(mpz_t n)
 		{
 			mpz_divexact(m, n, fa);
 			gmp_printf("%Zd=%Zd*%Zd\n", n, m, fa);
+			mpz_clear(fa);
+			mpz_clear(m);
 			return;
 		}
 	}
@@ -62,19 +64,17 @@ int main(int argc, char *argv[])
 
 	char buffer[10000];
 	mpz_t number;
-	int i = 1;
 
-	mpz_init(number);
 
 	while (fgets(buffer, sizeof(buffer), file) != NULL)
 	{
-		printf("line %d: %s\n", i, buffer), i++;
+		mpz_init(number);
 		mpz_set_str(number, buffer, 10);
 		faize_number(number);
+		mpz_clear(number);
 	}
 
 	fclose(file);
-	mpz_clear(number);
 	return (0);
 }
 
