@@ -9,8 +9,6 @@ int is_prime(const mpz_t num)
 
 	if (mpz_cmp_ui(num, 2) == 0)
 		return (1);
-	if (mpz_even_p(num))
-		return (0);
 
 	mpz_t divisor, ll;
 
@@ -23,11 +21,13 @@ int is_prime(const mpz_t num)
 		if (mpz_divisible_p(num, divisor))
 		{
 			mpz_clear(divisor);
+			mpz_clear(ll);
 			return (0);
 		}
 	}
 
 	mpz_clear(divisor);
+	mpz_clear(ll);
 	return (1);
 }
 void factorize_number(mpz_t n)
